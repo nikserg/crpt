@@ -14,5 +14,10 @@
       }
     },
     "require": {
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "if [[$(/opt/cprocsp/bin/amd64/cryptcp | grep \"CryptCP\")]]; then echo \"Пакет CryptoPro установлен\"; else echo \"Не установлен пакет CryptoPro, соединение с ЦРПТ будет невозможно\"; fi"
+        ]
     }
 }
