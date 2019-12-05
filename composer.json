@@ -9,11 +9,12 @@
         }
     ],
     "autoload": {
-      "psr-4": {
-        "nikserg\\crpt\\": ""
-      }
+        "psr-4": {
+            "nikserg\\crpt\\": ""
+        }
     },
     "require": {
+        "nikserg/cryptoprocli": "^0.03"
     },
     "scripts": {
         "post-install-cmd": [
