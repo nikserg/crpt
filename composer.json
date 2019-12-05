@@ -14,7 +14,8 @@
         }
     },
     "require": {
-        "nikserg/cryptoprocli": "^0.03"
+        "nikserg/cryptoprocli": "^0.03",
+        "guzzlehttp/guzzle": "^6.4.1"
     },
     "scripts": {
         "post-install-cmd": [
