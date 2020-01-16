@@ -89,7 +89,7 @@ class CRPT
                 ],
             ])->getBody()->getContents(), true);
         } catch (RequestException $e) {
-            throw new \Exception('Ошибка ответа от сервера ЦРПТ: '.$e->getCode().' '.$e->getMessage().$e->getTraceAsString(), 500, $e);
+            throw new \Exception('Ошибка ответа от сервера ЦРПТ: '.$e->getResponse()->getBody(), 500, $e);
         }
         if (!$jwt || !isset($jwt['token'])) {
             throw new \Exception('Невозможно получить JWT-токен в ЦРПТ с использованием указанной подписи');
