@@ -4,6 +4,7 @@ namespace nikserg\crpt;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use GuzzleHttp\Exception\RequestException;
 use nikserg\crpt\exception\NotAuthException;
 use nikserg\crpt\exception\TokenExpiredException;
 use nikserg\crpt\schema\AuthData;
