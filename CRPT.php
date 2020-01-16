@@ -80,13 +80,16 @@ class CRPT
     public function checkAuthData($uuid, $signedData)
     {
         //Отправляем подписанные данные для JWT-токена
-        $jwt = @json_decode($this->httpClient->post($this->getCRPTDomain() . 'auth/cert/', [
-            RequestOptions::JSON => [
-                'uuid' => $uuid,
-                'data' => $signedData,
-            ],
-        ])->getBody()->getContents(), true);
-
+        try {
+            $jwt = @json_decode($this->httpClient->post($this->getCRPTDomain() . 'auth/cert/', [
+                RequestOptions::JSON => [
+                    'uuid' => $uuid,
+                    'data' => $signedData,
+                ],
+            ])->getBody()->getContents(), true);
+        } catch (RequestException $e) {
+            throw new \Exception('Ошибка ответа от сервера ЦРПТ: '.$e->getCode().' '.$e->getMessage().$e->getTraceAsString(), 500, $e);
+        }
         if (!$jwt || !isset($jwt['token'])) {
             throw new \Exception('Невозможно получить JWT-токен в ЦРПТ с использованием указанной подписи');
         }
