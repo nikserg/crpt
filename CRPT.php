@@ -3,6 +3,7 @@
 namespace nikserg\crpt;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\Exception\RequestException;
 use nikserg\crpt\exception\NotAuthException;
@@ -139,11 +140,33 @@ class CRPT
     {
         $this->checkJwt();
         $code = substr($code, 0, 31);
-        $info = @json_decode($this->httpClient->get($this->getCRPTDomain() . 'facade/identifytools/' . urlencode($code), [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->jwt->token,
-            ],
-        ])->getBody()->getContents(), true);
+
+        try {
+            $info = @json_decode($this->httpClient->get($this->getCRPTDomain() . 'facade/identifytools/' . urlencode($code),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->jwt->token,
+                    ],
+                ])->getBody()->getContents(), true);
+        } catch (ClientException $e) {
+            if ($e->getCode() == 404) {
+                //Пробуем через другой адрес
+
+                $info = @json_decode($this->httpClient->get($this->getCRPTDomain() . 'facade/cis/cis_list?cis=&cis=' . urlencode($code),
+                    [
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $this->jwt->token,
+                        ],
+                    ])->getBody()->getContents(), true);
+                if ($info) {
+                    if (!isset($info[$code])) {
+                        throw new \Exception('Ошибка при получении информации о коде из альтернативного источника. Получен ответ '.print_r($info), 500, $e);
+                    }
+                    $info = $info[$code];
+                    $info['emissionDate'] = (new \DateTime('@'.substr($info['emissionDate'], 0, strlen($info['emissionDate'])-3)))->format('Y-m-dTH:i:s.vZ');
+                }
+            }
+        }
 
         if (!$info) {
             return null;
