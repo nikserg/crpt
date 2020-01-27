@@ -139,7 +139,7 @@ class CRPT
     {
         $this->checkJwt();
         $code = substr($code, 0, 31);
-        $info = @json_decode($this->httpClient->get($this->getCRPTDomain() . 'facade/identifytools/' . $code, [
+        $info = @json_decode($this->httpClient->get($this->getCRPTDomain() . 'facade/identifytools/' . urlencode($code), [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->jwt->token,
             ],
