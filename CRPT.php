@@ -165,6 +165,8 @@ class CRPT
                     $info = $info[$code];
                     $info['emissionDate'] = (new \DateTime('@'.substr($info['emissionDate'], 0, strlen($info['emissionDate'])-3)))->format('Y-m-dTH:i:s.vZ');
                 }
+            } else {
+                throw $e;
             }
         }
 
