@@ -149,7 +149,7 @@ class CRPT
                     ],
                 ])->getBody()->getContents(), true);
         } catch (ClientException $e) {
-            if ($e->getCode() == 404) {
+            if ($e->getCode() == 404 || $e->getCode() == 400) {
                 //Пробуем через другой адрес
 
                 $info = @json_decode($this->httpClient->get($this->getCRPTDomain() . 'facade/cis/cis_list?cis=&cis=' . urlencode($code),
