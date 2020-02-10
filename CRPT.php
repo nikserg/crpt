@@ -134,6 +134,7 @@ class CRPT
      *
      * @param $code
      * @return CodeInfo|null
+     * @throws \Exception
      * @throws NotAuthException
      */
     public function getCodeInfo($code)
@@ -141,6 +142,9 @@ class CRPT
         $this->checkJwt();
         $code = substr($code, 0, 31);
 
+        if (strlen($code) < 31)  {
+            throw new \Exception('Код после обрезки при получении информации из ЦРПТ слишком короткий: `'.$code.'`', 500);
+        }
         try {
             $info = @json_decode($this->httpClient->get($this->getCRPTDomain() . 'facade/identifytools/' . urlencode($code),
                 [
@@ -152,18 +156,21 @@ class CRPT
             if ($e->getCode() == 404 || $e->getCode() == 400) {
                 //Пробуем через другой адрес
 
-                $info = @json_decode($this->httpClient->get($this->getCRPTDomain() . 'facade/cis/cis_list?cis=&cis=' . urlencode($code),
+                $jsonData = $this->httpClient->get($this->getCRPTDomain() . 'facade/cis/cis_list?cis=&cis=' . urlencode($code),
                     [
                         'headers' => [
                             'Authorization' => 'Bearer ' . $this->jwt->token,
                         ],
-                    ])->getBody()->getContents(), true);
+                    ])->getBody()->getContents();
+                $info = @json_decode($jsonData, true);
                 if ($info) {
                     if (!isset($info[$code])) {
                         throw new \Exception('Ошибка при получении информации о коде из альтернативного источника. Получен ответ '.print_r($info), 500, $e);
                     }
                     $info = $info[$code];
                     $info['emissionDate'] = (new \DateTime('@'.substr($info['emissionDate'], 0, strlen($info['emissionDate'])-3)))->format('Y-m-dTH:i:s.vZ');
+                } else {
+                    throw new \Exception('Не получается расшифровать ответ от ЦРПТ. Ожидается JSON, получен ответ '.$jsonData, 500, $e);
                 }
             } else {
                 throw $e;
@@ -180,6 +187,10 @@ class CRPT
         return $return;
     }
 
+    /**
+     * @throws NotAuthException
+     * @throws TokenExpiredException
+     */
     private function checkJwt()
     {
         if (!$this->jwt) {
