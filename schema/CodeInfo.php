@@ -65,6 +65,14 @@ class CodeInfo {
     public $ownerName;
 
     /**
+     * ИНН производителя
+     *
+     *
+     * @var string
+     */
+    public $producerInn;
+
+    /**
      * ИНН собственника товара
      *
      * @var string
@@ -102,4 +110,15 @@ class CodeInfo {
      * @var int
      */
     public $countChildren;
+
+    /**
+     * ИНН владельца или производителя
+     *
+     *
+     * @return bool
+     */
+    public function getInn()
+    {
+        return $this->ownerInn or $this->producerInn;
+    }
 }
