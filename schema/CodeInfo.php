@@ -119,6 +119,10 @@ class CodeInfo {
      */
     public function getInn()
     {
-        return $this->ownerInn or $this->producerInn;
+        if ($this->ownerInn)
+        {
+            return $this->ownerInn;
+        }
+        return $this->producerInn;
     }
 }
